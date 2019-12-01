@@ -52,6 +52,7 @@
     "react": "^15.5.0 || ^16.0.0"
   },
   "scripts": {
+    "prepare": "npm run build",
     "prepublish": "webpack --progress",
     "clean": "rm -rf ./lib",
     "build": "webpack --progress",
