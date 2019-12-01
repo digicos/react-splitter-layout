@@ -30,9 +30,34 @@ class SplitterLayout extends React.Component {
     this.handleMouseUp = this.handleMouseUp.bind(this);
     this.handleTouchMove = this.handleTouchMove.bind(this);
     this.handleSplitterMouseDown = this.handleSplitterMouseDown.bind(this);
+    //this.handleCollapseLeft = this.handleCollapseLeft.bind(this);
+    this.handleCollapse = this.handleCollapse.bind(this);
+    let splitterCollapseDirectionClass = 'splitter-collapser-right';
+    let collapseArrowClass = 'triangle-right';
+
+    if(props.splitterCollapseDirection === 'left'){
+      splitterCollapseDirectionClass = 'splitter-collapser-left';
+      collapseArrowClass = 'triangle-left';
+    } else if(props.splitterCollapseDirection === 'right'){
+      splitterCollapseDirectionClass = 'splitter-collapser-right';
+      collapseArrowClass = 'triangle-right';
+    }else if(props.splitterCollapseDirection === 'up'){
+      splitterCollapseDirectionClass = 'splitter-collapser-up';
+      collapseArrowClass = 'triangle-up';
+    }else if(props.splitterCollapseDirection === 'down'){
+      splitterCollapseDirectionClass = 'splitter-collapser-down';
+      collapseArrowClass = 'triangle-down';
+    }
+
+
     this.state = {
       secondaryPaneSize: 0,
-      resizing: false
+      resizing: false,
+      splitterCollapsed: false,
+      secondaryPaneSizeBeforeCollapse: 0,
+      splitterCollapseDirection: props.splitterCollapseDirection,
+      splitterCollapseDirectionClass: splitterCollapseDirectionClass,
+      collapseArrowClass: collapseArrowClass
     };
   }
 
@@ -152,7 +177,14 @@ class SplitterLayout extends React.Component {
         top: e.clientY
       }, true);
       clearSelection();
-      this.setState({ secondaryPaneSize });
+
+      if(secondaryPaneSize > 0){
+        const collapseArrowClass = this.getArrowDirection(false);
+        this.setState({ secondaryPaneSize, collapseArrowClass});
+      }else{
+        const collapseArrowClass = this.getArrowDirection(true);
+        this.setState({ secondaryPaneSize,collapseArrowClass});
+      }
     }
   }
 
@@ -169,8 +201,59 @@ class SplitterLayout extends React.Component {
     this.setState(prevState => (prevState.resizing ? { resizing: false } : null));
   }
 
+  // handleCollapseLeft() {
+  //   const collapsedLeft = true;
+  //   const collapsedRight = false;
+  //   const secondaryPaneSize = 50;
+  //   this.setState({ collapsedLeft, collapsedRight, secondaryPaneSize });
+  // }
+  getArrowDirection(splitterCollapsed){
+    let collapseArrowClass = '';
+    
+    switch(this.props.splitterCollapseDirection){
+      case 'right':
+          collapseArrowClass = splitterCollapsed ? 'triangle-left' : 'triangle-right';
+        break;
+      case 'left':
+          collapseArrowClass = splitterCollapsed ? 'triangle-right' : 'triangle-left';
+        break;
+      case 'up':
+          collapseArrowClass = splitterCollapsed ? 'triangle-down' : 'triangle-up';
+        break;
+      case 'down':
+          collapseArrowClass = splitterCollapsed ? 'triangle-up' : 'triangle-down';
+        break;
+    }
+    return collapseArrowClass;
+  }
+
+  handleCollapse() {
+    // const collapsedLeft = false;
+    // const collapsedRight = true;
+    
+    if(this.state.secondaryPaneSize === 0){
+      const secondaryPaneSize = this.state.secondaryPaneSizeBeforeCollapse;
+      const secondaryPaneSizeBeforeCollapse = 0;
+      const splitterCollapsed = false;
+      const collapseArrowClass = this.getArrowDirection(splitterCollapsed);
+      this.setState({secondaryPaneSize,secondaryPaneSizeBeforeCollapse,collapseArrowClass,splitterCollapsed})
+    }else{
+      const secondaryPaneSize = 0;
+      const splitterCollapsed = true;
+      const collapseArrowClass = this.getArrowDirection(splitterCollapsed);
+      const secondaryPaneSizeBeforeCollapse = this.state.secondaryPaneSize;
+      this.setState({secondaryPaneSize,secondaryPaneSizeBeforeCollapse,collapseArrowClass,splitterCollapsed})
+    }
+    
+  }
+
+  alertUser() {
+    console.log('test');
+  }
+
   render() {
     let containerClasses = 'splitter-layout';
+
     if (this.props.customClassName) {
       containerClasses += ` ${this.props.customClassName}`;
     }
@@ -201,6 +284,8 @@ class SplitterLayout extends React.Component {
       );
     }
 
+    
+
     return (
       <div className={containerClasses} ref={(c) => { this.container = c; }}>
         {wrappedChildren[0]}
@@ -212,7 +297,14 @@ class SplitterLayout extends React.Component {
               ref={(c) => { this.splitter = c; }}
               onMouseDown={this.handleSplitterMouseDown}
               onTouchStart={this.handleSplitterMouseDown}
-            />
+            >
+              <div className={this.state.splitterCollapseDirectionClass}>
+                <div ref={(c) => { this.splitter = c; }} onClick={this.handleCollapse} className={this.state.collapseArrowClass}></div>
+              </div>
+              {/* <div className="splitter-collapser-left">
+                <div ref={(c) => { this.splitter = c; }} onClick={this.handleCollapseLeft} className="triangle-left"></div>
+              </div> */}
+            </div>
           )
         }
         {wrappedChildren.length > 1 && wrappedChildren[1]}
@@ -246,7 +338,8 @@ SplitterLayout.defaultProps = {
   onDragStart: null,
   onDragEnd: null,
   onSecondaryPaneSizeChange: null,
-  children: []
+  children: [],
+  splitterCollapseDirection: 'right'
 };
 
 export default SplitterLayout;
