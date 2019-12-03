@@ -32,20 +32,20 @@ class SplitterLayout extends React.Component {
     this.handleSplitterMouseDown = this.handleSplitterMouseDown.bind(this);
     //this.handleCollapseLeft = this.handleCollapseLeft.bind(this);
     this.handleCollapse = this.handleCollapse.bind(this);
-    let splitterCollapseDirectionClass = 'splitter-collapser-right';
+    let splitterCollapseDirectionClass = this.props.vertical ? 'splitter-collapser-vertical' : 'splitter-collapser-horizontal';
     let collapseArrowClass = 'triangle-right';
 
     if(props.splitterCollapseDirection === 'left'){
-      splitterCollapseDirectionClass = 'splitter-collapser-left';
+      //splitterCollapseDirectionClass = 'splitter-collapser-horizontal';
       collapseArrowClass = 'triangle-left';
     } else if(props.splitterCollapseDirection === 'right'){
-      splitterCollapseDirectionClass = 'splitter-collapser-right';
+      //splitterCollapseDirectionClass = 'splitter-collapser-horizontal';
       collapseArrowClass = 'triangle-right';
     }else if(props.splitterCollapseDirection === 'up'){
-      splitterCollapseDirectionClass = 'splitter-collapser-up';
+      //splitterCollapseDirectionClass = 'splitter-collapser-vertical';
       collapseArrowClass = 'triangle-up';
     }else if(props.splitterCollapseDirection === 'down'){
-      splitterCollapseDirectionClass = 'splitter-collapser-down';
+      //splitterCollapseDirectionClass = 'splitter-collapser-vertical';
       collapseArrowClass = 'triangle-down';
     }
 
